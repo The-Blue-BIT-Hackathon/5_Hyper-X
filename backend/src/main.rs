@@ -4,7 +4,7 @@ mod utils;
 mod controllers;
 mod routes;
 
-use routes::{user};
+use routes::{user, company};
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
 use actix_web::{http::header, web, App, HttpServer};
@@ -62,6 +62,7 @@ async fn main() -> std::io::Result<()> {
                 env: config.clone(),
             }))
                 .configure(user::config)
+                .configure(company::config)
                 .wrap(cors)
                 .wrap(Logger::default())
     })
