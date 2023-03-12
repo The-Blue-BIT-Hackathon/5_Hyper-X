@@ -17,7 +17,7 @@ use dotenv::dotenv;
 
 pub struct AppState {
     db: Pool<Postgres>,
-    env: Config,
+    env: Config
 }
 
 #[actix_web::main]
@@ -45,10 +45,8 @@ async fn main() -> std::io::Result<()> {
             println!("Failed to connect to the database: {:?}", err);
             std::process::exit(1);
         }
-    };
-    
-    let mongo_db = MongoRepo::init().await;
-    let mongo_db_data = Data::new(mongo_db);
+    }; 
+
 
     println!("Server started successfully");        
     HttpServer::new(move || {
@@ -60,10 +58,8 @@ async fn main() -> std::io::Result<()> {
             }))
                 .configure(user::config)
                 .configure(company::config)
-            .app_data(mongo_db_data.clone())
-                .configure(job::config)
-                              
-                .wrap(Cors::default().allow_any_origin().send_wildcard())
+                .configure(job::config)              
+                .wrap(Cors::default().allow_any_origin().allow_any_header().allow_any_method().send_wildcard())
                 .wrap(Logger::default())
     })
     .bind(("127.0.0.1", 8000))?

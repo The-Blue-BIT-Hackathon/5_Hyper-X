@@ -143,7 +143,7 @@ async fn logout_handler(_: jwt_auth::JwtMiddleware) -> impl Responder {
 }
 
 
-#[get("/users/me")]
+#[get("/info")]
 async fn get_me_handler(
     req: HttpRequest,
     data: web::Data<AppState>,
