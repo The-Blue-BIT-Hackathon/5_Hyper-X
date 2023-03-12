@@ -9,7 +9,7 @@ pub struct Job {
     pub title: String,
     pub location: String,
     pub experience: u8,
-    pub payroll: u64,
+    pub payroll: i64,
     pub job_type: String,
     pub skills: Vec<String>,
     pub description: String
