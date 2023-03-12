@@ -1,13 +1,15 @@
 mod config;
 mod models;
 mod utils;
+mod repository;
 mod controllers;
 mod routes;
 
-use routes::{user, company};
+use routes::{user, company, job};
+use repository::mongodb_job::MongoRepo;
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
-use actix_web::{http::header, web, App, HttpServer};
+use actix_web::{web::Data, http::header, web, App, HttpServer};
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 use config::Config;
 use dotenv::dotenv;
@@ -44,6 +46,9 @@ async fn main() -> std::io::Result<()> {
             std::process::exit(1);
         }
     };
+    
+    let mongo_db = MongoRepo::init().await;
+    let mongo_db_data = Data::new(mongo_db);
 
     println!("Server started successfully");        
     HttpServer::new(move || {
@@ -61,6 +66,8 @@ async fn main() -> std::io::Result<()> {
                 db: pool.clone(),
                 env: config.clone(),
             }))
+            .app_data(mongo_db_data.clone())
+                .configure(job::config)
                 .configure(user::config)
                 .configure(company::config)
                 .wrap(cors)
