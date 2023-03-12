@@ -58,10 +58,11 @@ async fn main() -> std::io::Result<()> {
                 db: pool.clone(),
                 env: config.clone(),
             }))
-                .app_data(mongo_db_data.clone())
-                .configure(job::config)
                 .configure(user::config)
                 .configure(company::config)
+            .app_data(mongo_db_data.clone())
+                .configure(job::config)
+                              
                 .wrap(Cors::default().allow_any_origin().send_wildcard())
                 .wrap(Logger::default())
     })
