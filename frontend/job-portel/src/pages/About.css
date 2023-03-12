@@ -1,0 +1,30 @@
+.about-main-container{
+    margin: 5% 7%;
+}
+
+
+.about-start{
+    padding: 0 0 7px 0;
+    border-bottom: 4px solid #FFB84C;
+}
+
+.about-end{
+    padding: 0 0 20px 0;
+    border-bottom: 4px solid #FFB84C;
+}
+
+.about-jobhive{
+    margin-top: 50px;
+    text-align: center;
+    margin-bottom:5%;
+}
+
+.about-inside-container{
+    margin: 3%;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    box-shadow: 1px 1px 5px 1px grey;
+    margin-bottom: 20px;
+}

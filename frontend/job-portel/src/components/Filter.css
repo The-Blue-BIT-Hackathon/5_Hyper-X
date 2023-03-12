@@ -1,0 +1,28 @@
+.filter-form{
+    margin-bottom: 20px;
+    border: 1px solid;
+    padding: 2%;
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+.filter-input{
+    height: 50px;
+    /* width: 300px; */
+    margin-bottom: 5%;
+    display: block;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.filter-input:hover{
+    border: 1px solid blue;
+}
+
+.filter-lable{
+    margin: 5px;
+}
+
+.WFH-checkbox{
+    margin-right: 10px;
+}

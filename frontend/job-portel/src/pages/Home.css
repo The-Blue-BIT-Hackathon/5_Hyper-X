@@ -1,0 +1,9 @@
+.jobs-main-container{
+    margin: 5% 7%;
+}
+
+.listed-job-containe{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

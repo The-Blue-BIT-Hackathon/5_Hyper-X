@@ -52,28 +52,20 @@ async fn main() -> std::io::Result<()> {
 
     println!("Server started successfully");        
     HttpServer::new(move || {
-        let cors = Cors::default()
-            .allowed_origin("http://localhost:3000")
-            .allowed_methods(vec!["GET", "POST"])
-            .allowed_headers(vec![
-                header::CONTENT_TYPE,
-                header::AUTHORIZATION,
-                header::ACCEPT,
-            ])
-            .supports_credentials();
+
         App::new()
             .app_data(web::Data::new(AppState {
                 db: pool.clone(),
                 env: config.clone(),
             }))
-            .app_data(mongo_db_data.clone())
+                .app_data(mongo_db_data.clone())
                 .configure(job::config)
                 .configure(user::config)
                 .configure(company::config)
-                .wrap(cors)
+                .wrap(Cors::default().allow_any_origin().send_wildcard())
                 .wrap(Logger::default())
     })
-    .bind(("127.0.0.1", 8002))?
+    .bind(("127.0.0.1", 8000))?
     .run()
     .await
 }
