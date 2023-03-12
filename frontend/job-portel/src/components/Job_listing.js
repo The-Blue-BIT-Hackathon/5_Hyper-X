@@ -2,9 +2,10 @@ import React, {useContext, useState} from 'react'
 import Footer from './Footer'
 import './Job_listing.css'
 import Navbar from './Navbar';
-import {Navigate, redirect} from 'react-router-dom';
+import {Navigate, redirect, useNavigate} from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import axios from 'axios';
+
 
 const Job_listing = () => {
   const { authState } = useContext(AuthContext);
@@ -13,6 +14,7 @@ const Job_listing = () => {
   const [experience, setExperience] = useState(0);
   const [payroll, setPayroll] = useState("");
   const [jobType, setJobType] = useState("");
+  const navigate = useNavigate();
   
   if (!authState.authenticated) {
     alert("Not Logged In. Please Login Again");
@@ -53,7 +55,7 @@ const Job_listing = () => {
   <div class="row justify-content-center">
   <div class="col-md-5">
    <div class="card">
-     <h2 class="card-title text-center text-white">Post Job Opening</h2>
+     <h2 class="card-title text-center">Post Job Opening</h2>
       <div class="card-body py-md-4">
        <div _lpchecked="1" >
           {/* <div class="form-group">
@@ -66,7 +68,7 @@ const Job_listing = () => {
                           
    <div class="form-group">
      {/* <input type="text" class="form-control" id="location" placeholder="Location" required/> */}
-     <label htmlFor="location" className='text-white'>Select Location</label>
+     <label htmlFor="location" className=''>Select Location</label>
       <select name="location" id="job-type" required onChange={(e) => setLocation(e.target.value)}>
           <option value="remote">Remote</option>
           <option value="on-site">on-site</option>
@@ -87,7 +89,7 @@ const Job_listing = () => {
       </select>
    </div>
    <div class="" style={{display:'flex', justifyContent:'center'}}>
-        <div> <button class="btn btn-primary posting-btn" onClick={()=>handleSubmit()}>POST</button> </div>
+        <div> <button class="btn btn-primary posting-btn" onClick={()=>{alert("Added Job Successfully"); navigate("/")}}>POST</button> </div>
     </div>
        </div>
      </div>
