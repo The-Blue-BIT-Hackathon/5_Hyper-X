@@ -1,11 +1,13 @@
-use crate::repository::mongodb_job::MongoRepo;
+use crate::{repository::mongodb_job::MongoRepo, AppState};
 use crate::models::job::Job;
 
 use actix_web::{
     post, get, delete,web,
     web::{Data, Json, Path},
-    HttpResponse,
+    HttpResponse, Responder
 };
+
+use serde_json::json;
 
 use serde::Deserialize;
 
@@ -29,7 +31,9 @@ pub async fn create_job(db: Data<MongoRepo>, new_job: Json<Job>) -> HttpResponse
     }
 }
 
- #[get("/job/{id}")]
+
+
+#[get("/job/{id}")]
 pub async fn get_job(db: Data<MongoRepo>, path: Path<String>) -> HttpResponse {
     let id = path.into_inner();
     if id.is_empty() {
@@ -68,6 +72,28 @@ pub async fn get_all_jobs(db: Data<MongoRepo>) -> HttpResponse {
         Ok(jobs) => HttpResponse::Ok().json(jobs),
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
+}
+
+
+#[get("/company/{id}")]
+pub async fn get_jobbycompany(db: Data<MongoRepo>, path: Path<String>) -> HttpResponse {
+    let id = path.into_inner();
+    if id.is_empty() {
+        return HttpResponse::BadRequest().body("invalid ID");
+    }
+    let user_detail = db.get_jobbycompany(&id).await;
+    match user_detail {
+        Ok(user) => HttpResponse::Ok().json(user),
+        Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
+    }
+}
+
+
+#[get("/healthchecker")]
+async fn health_checker_handler() -> impl Responder {
+    const MESSAGE: &str = "JWT Authentication in Rust using Actix-web, Postgres, and SQLX";
+
+    HttpResponse::Ok().json(json!({"status": "success", "message": MESSAGE}))
 }
 
 #[derive(Deserialize)]

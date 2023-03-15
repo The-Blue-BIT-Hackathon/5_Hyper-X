@@ -1,9 +1,10 @@
 use std::env;
 extern crate dotenv;
 use dotenv::dotenv;
+use std::str::FromStr;
 
 use mongodb::bson::{doc, oid::ObjectId, Document};
-use mongodb::options::{FindOneAndUpdateOptions, FindOptions, IndexOptions, ReturnDocument};
+use mongodb::options::{FindOneAndUpdateOptions, FindOptions, IndexOptions, ReturnDocument, FindOneOptions};
 use mongodb::{bson, options::ClientOptions, Client, Collection, IndexModel};
 use futures::stream::TryStreamExt; 
 
@@ -57,11 +58,13 @@ impl MongoRepo {
     }
     
     pub async fn get_job(&self, id: &String) -> Result<Job, Error> {
-        let obj_id = ObjectId::parse_str(id).unwrap();
-        let filter = doc! {"_id": obj_id};
+        let obj_id = ObjectId::from_str(&id).unwrap();
+        let filter = doc! {"payroll": 8000};
+        println!("{}", obj_id);
+        let options = FindOneOptions::builder().build();
         let job_detail = self
             .col
-            .find_one(filter, None)
+            .find_one(filter, options)
             .await
             .ok()
             .expect("Error getting user's detail");
@@ -69,7 +72,7 @@ impl MongoRepo {
     }
 
     pub async fn delete_job(&self, id: &String) -> Result<DeleteResult, Error> {
-        let obj_id = ObjectId::parse_str(id).unwrap();
+        let obj_id = ObjectId::from_str(&id).unwrap();
         let filter = doc! {"_id": obj_id};
         let job_detail = self
             .col
@@ -80,22 +83,26 @@ impl MongoRepo {
         Ok(job_detail)
     }
 
-    pub async fn get_all_jobs(&self) -> Result<Vec<Job>, Error> {
+    pub async fn get_all_jobs(&self) -> Result<Vec<Job>, mongodb::error::Error> {
         let mut cursors = self
             .col
             .find(None, None)
             .await
             .ok()
             .expect("Error getting list of jobs");
-        let mut jobs: Vec<Job> = Vec::new();
-        while let Some(job) = cursors
-            .try_next()
+        let mut jobs: Vec<Job> = cursors.try_collect().await.unwrap();
+        Ok(jobs)
+    }
+
+    pub async fn get_jobbycompany(&self, id: &String) -> Result<Vec<Job>, mongodb::error::Error> {
+        let filter = doc! {"company_id" : id};
+        let mut cursors = self
+            .col
+            .find(filter, None)
             .await
             .ok()
-            .expect("Error mapping through cursor")
-        {
-            jobs.push(job)
-        }
+            .expect("Error getting list of jobs");
+        let mut jobs: Vec<Job> = cursors.try_collect().await.unwrap();
         Ok(jobs)
     }
 
@@ -108,19 +115,19 @@ impl MongoRepo {
                     filter = doc!(
                         "$and": [
                             {"job_type": jobtype},
-                            {"payroll": pay},
-                            {"skills": skill}
+                            {"payroll": {"$gte" :pay}},
+                            {"skills": {"$in":skill}}
                         ]
                     );
                 }
                 else{
                     filter = doc!(
-                        "$and":[{"job_type":jobtype}, {"payroll":pay}]
+                        "$and":[{"job_type":jobtype}, {"payroll": {"$gte" :pay}}]
                     );
                 }
             }
             else if let Some(skill) = skills {
-                filter = doc!("$and":[{"job_type":jobtype}, {"skills":skill}]);
+                filter = doc!("$and":[{"job_type":jobtype}, {"skills": {"$in" :skill}}]);
             }
             else {
                 filter = doc!("job_type":jobtype);
@@ -129,13 +136,13 @@ impl MongoRepo {
 
         else if let Some(pay) = payroll {
             if let Some(skill) = skills {
-                filter = doc!("$and":[{"payroll":pay}, {"skills":skill}]);
+                filter = doc!("$and":[{"payroll":{"$gte" :pay}}, {"skills": {"$in":skill}}]);
             }
-            else{filter = doc!("payroll":pay);}
+            else{filter = doc!("payroll": {"$gte" :pay} );}
         }
         
         else if let Some(skill) = skills {
-            filter = doc!("skills":skill);
+            filter = doc!("skills":{"$in" : skill});
         } 
 
         let mut cursors = self.col.find(filter, None).await.ok().expect("Error Getting List of Jobs");

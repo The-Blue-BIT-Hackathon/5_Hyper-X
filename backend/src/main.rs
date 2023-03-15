@@ -47,6 +47,8 @@ async fn main() -> std::io::Result<()> {
         }
     }; 
 
+    let mongodb = MongoRepo::init().await;
+    let mongodb_data = Data::new(mongodb);
 
     println!("Server started successfully");        
     HttpServer::new(move || {
@@ -56,6 +58,7 @@ async fn main() -> std::io::Result<()> {
                 db: pool.clone(),
                 env: config.clone(),
             }))
+            .app_data(mongodb_data.clone())
                 .configure(user::config)
                 .configure(company::config)
                 .configure(job::config)              

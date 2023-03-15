@@ -1,5 +1,5 @@
 use actix_web::web;
-use crate::controllers::user_controller::{health_checker_handler, register_user_handler, get_me_handler, login_user_handler, logout_handler};
+use crate::controllers::{user_controller::{health_checker_handler, register_user_handler, get_me_handler, login_user_handler, logout_handler}, job_controller::get_jobbycompany};
 
 pub fn config(conf: &mut web::ServiceConfig) {
     let scope = web::scope("/api")
